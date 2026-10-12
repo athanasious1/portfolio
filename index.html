@@ -1,0 +1,599 @@
+!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هانزو | Cyberpunk Portfolio</title>
+    <!-- Remixicon CDN for sleek futuristic icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #030712;
+            --card-bg: rgba(15, 23, 42, 0.7);
+            --card-border: rgba(56, 189, 248, 0.25);
+            --neon-blue: #38bdf8;
+            --neon-cyan: #06b6d4;
+            --neon-purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        /* Canvas background for interactive particles */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 15px 30px;
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--neon-blue);
+            text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-sub);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* Layout Container */
+        .container {
+            width: 90%;
+            max-width: 950px;
+            margin: 110px auto 50px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            will-change: transform;
+            transition: border-color 0.4s, box-shadow 0.4s, opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(56, 189, 248, 0.7);
+            box-shadow: 0 15px 40px rgba(56, 189, 248, 0.25);
+        }
+
+        /* Scroll Reveal Effect Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px) scale(0.96);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.5);
+            animation: floating 4s ease-in-out infinite;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #030712;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--neon-blue);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 26px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--neon-blue);
+            color: #030712;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.8);
+            transform: translateY(-3px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+        }
+
+        .btn-outline:hover {
+            background: rgba(56, 189, 248, 0.15);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--neon-blue);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: rgba(3, 7, 18, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 20px;
+            border-radius: 14px;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-blue), var(--neon-purple));
+            border-radius: 8px;
+            transition: width 1.5s ease-in-out;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            background: rgba(3, 7, 18, 0.6);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 16px;
+            padding: 22px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .project-card:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.2);
+        }
+
+        .project-title {
+            color: var(--neon-blue);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Contact Section Form */
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            background: rgba(3, 7, 18, 0.6);
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: var(--text-sub);
+            border-top: 1px solid var(--card-border);
+            margin-top: 40px;
+            background: rgba(3, 7, 18, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .section-title { font-size: 1.4rem; }
+            .nav-links { display: none; }
+            .glass-card { padding: 22px; }
+
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particle Background Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Navigation Header -->
+    <nav>
+        <div class="logo">
+            <i class="ri-gamepad-line"></i> HANZO
+        </div>
+        <ul class="nav-links">
+            <li><a href="#hero"><i class="ri-home-4-line"></i> الرئيسية</a></li>
+            <li><a href="#about"><i class="ri-user-3-line"></i> من أنا</a></li>
+            <li><a href="#skills"><i class="ri-code-s-slash-line"></i> المهارات</a></li>
+            <li><a href="#projects"><i class="ri-rocket-line"></i> المشاريع</a></li>
+            <li><a href="#contact"><i class="ri-mail-line"></i> التواصل</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        
+        <!-- Hero Section -->
+        <header class="glass-card hero reveal" id="hero">
+            <div class="avatar-container">
+                <img src="https://placehold.co/200x200/030712/38bdf8?text=HANZO" alt="Hanzo Avatar" class="avatar-img">
+            </div>
+            <h1>مرحباً بك في عالم هانزو الرقمي <i class="ri-sparkling-fill"></i></h1>
+            <p style="color: var(--text-sub); max-width: 600px;">
+                مطور واجهات ومبتكر محتوى ألعاب. شغوف بدمج المؤثرات البصرية وتصميمات السايبربانك لبناء مشاريع ويب عصرية وسلسة.
+            </p>
+            <div class="badge">
+                <span class="dot"></span> متصل الآن ومستعد للتطوير والتعاون
+            </div>
+            <div class="btn-group">
+                <a href="#projects" class="btn btn-primary"><i class="ri-rocket-2-line"></i> استكشف أعمالي</a>
+                <a href="#contact" class="btn btn-outline"><i class="ri-send-plane-line"></i> تواصل معي</a>
+            </div>
+        </header>
+
+        <!-- About Me Section -->
+        <section class="glass-card reveal" id="about">
+            <h2 class="section-title"><i class="ri-user-search-line"></i> من أنا؟</h2>
+            <p style="color: var(--text-sub); font-size: 1.1rem; line-height: 1.9;">
+                أنا صانع محتوى ومطور ألعاب وشغوف بتصميم صفحات الويب الحديثة. أركز على تقديم تجارب مستخدم مميزة تستخدم أحدث مؤثرات الـ HTML و CSS و JavaScript، مع ضمان عمل كافة المؤثرات بسلاسة وبسرعة عالية.
+            </p>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="glass-card reveal" id="skills">
+            <h2 class="section-title"><i class="ri-cpu-line"></i> المهارات والأدوات</h2>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span><i class="ri-html5-line" style="color: var(--neon-blue);"></i> HTML & CSS</span>
+                        <span>95%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" data-progress="95%"></div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span><i class="ri-javascript-line" style="color: var(--neon-blue);"></i> JavaScript</span>
+                        <span>85%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" data-progress="85%"></div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span><i class="ri-code-box-line" style="color: var(--neon-blue);"></i> C++ & Logic</span>
+                        <span>75%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" data-progress="75%"></div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span><i class="ri-video-download-line" style="color: var(--neon-blue);"></i> Video Editing</span>
+                        <span>90%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" data-progress="90%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="glass-card reveal" id="projects">
+            <h2 class="section-title"><i class="ri-gamepad-line"></i> المشاريع والألعاب</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div>
+                        <div class="project-title"><i class="ri-trophy-line"></i> Gaming Hub Platform</div>
+                        <p style="color: var(--text-sub); font-size: 0.95rem;">منصة تفاعلية واستعراضية لمحتوى الألعاب بأسلوب السايبربانك العصرى.</p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div>
+                        <div class="project-title"><i class="ri-planet-line"></i> Interactive Portfolio</div>
+                        <p style="color: var(--text-sub); font-size: 0.95rem;">موقع شخصي بدعم حركة 3D وتفاعلات الفضاء المضيئة بالنيون.</p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div>
+                        <div class="project-title"><i class="ri-film-line"></i> Gaming Highlights</div>
+                        <p style="color: var(--text-sub); font-size: 0.95rem;">تعديل وصناعة محتوى سينمائي واحترافي للألعاب وفيديوهات الجيمنج.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="glass-card reveal" id="contact">
+            <h2 class="section-title"><i class="ri-mail-send-line"></i> تواصل معي</h2>
+            <p style="color: var(--text-sub); margin-bottom: 20px;">
+                يمكنك إرسال رسالة مباشرة لي أو التواصل عبر البريد الإلكتروني: <strong style="color: var(--neon-blue);">zaiem7255@gmail.com</strong>
+            </p>
+            <form action="https://formspree.io/f/mkjovqpn" method="POST" class="contact-form">
+                <input type="text" name="name" placeholder="اسمك" class="form-input" required>
+                <input type="email" name="email" placeholder="بريدك الإلكتروني" class="form-input" required>
+                <textarea name="message" placeholder="اكتب رسالتك هنا..." class="form-input" required></textarea>
+                <button type="submit" class="btn btn-primary" style="align-self: flex-start;">
+                    <i class="ri-send-plane-fill"></i> إرسال الرسالة
+                </button>
+            </form>
+            </form>
+        </section>
+
+    </div>
+
+    <footer>
+        <p>© 2026 Hanzo Cyberpunk Portfolio. Designed for Speed & Style.</p>
+    </footer>
+
+    <script>
+        /* 1. Particle Starfield Canvas Animation */
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = [];
+        const particleCount = 65;
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2 + 0.5,
+                color: Math.random() > 0.5 ? '#38bdf8' : '#a855f7',
+                speedX: (Math.random() - 0.5) * 0.4,
+                speedY: (Math.random() - 0.5) * 0.4
+            });
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = p.color;
+                ctx.fill();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        /* 2. Scroll-Triggered Reveal Effect (IntersectionObserver) */
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+
+                    // Animate skill progress fills when section is revealed
+                    const progressFills = entry.target.querySelectorAll('.progress-fill');
+                    progressFills.forEach(fill => {
+                        fill.style.width = fill.getAttribute('data-progress');
+                    });
+                }
+            });
+        }, { threshold: 0.12 });
+
+        revealElements.forEach(el => observer.observe(el));
+
+        /* 3. Interactive 3D Tilt Effect on Cards */
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+
+                card.style.transform = `perspective(1000px) rotateX(${-y / 30}deg) rotateY(${x / 30}deg) translateY(-6px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
+            });
+        });
+    </script>
+</body>
+</html>
